@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-33141847-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-33141847-1');
+        </script>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>COVID-19 Dahboard</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel = "stylesheet" href="css/style.css"> 
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+        <script src= "https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+        
+        <script type="text/javascript" src="js/myscript.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+        <script type="text/javascript">
+            google.charts.load('current', {
+                'packages':['geochart'],
+                // Note: you will need to get a mapsApiKey for your project.
+                // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
+                'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+            });
+            
+            const mapurl = "https://covid19.mathdro.id/api/countries/india/confirmed";
+
+            var getJSON = function(url, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'json';
+                xhr.onload = function() {
+                    var status = xhr.status;
+                    if (status === 200) {
+                        callback(null, xhr.response);
+                    } else {
+                        callback(status, xhr.response);
+                    }
+                };
+                xhr.send();
+            };
+            getJSON(mapurl,function(err, data) {
+                if (err !== null) {
+                    alert('Something went wrong: ' + err);
+                } else {
+                
+                    google.charts.setOnLoadCallback(drawRegionsMap(data));
+
+                    function drawRegionsMap(data) {
+                        var arr=[];
+                        var Header= ['State', 'No Of Cases'];
+                        arr.push(Header);
+                        console.log("GET Ready");
+                        for( i=0;i<36;i++){
+                            var temp=[];
+                            temp.push(data[i].provinceState);
+                            temp.push(data[i].confirmed);
+                            arr.push(temp);
+                        }
+                        var temp=[];
+                        temp.push("Orissa");
+                        temp.push(8601);
+                        arr.push(temp);
+                        var data = new google.visualization.arrayToDataTable(arr);
+                    
+
+                    var opts = {
+                        region: 'IN',
+                        displayMode: 'regions',
+                        resolution: 'provinces',
+                        colorAxis: {colors: ['#00853f', '#A26A5E', '#FF2D00']},
+                        backgroundColor: '#81d4fa'
+                    };
+
+                        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+                        chart.draw(data, opts);
+                    }            
+
+                }
+            });
+        </script>
+        
+        <script>  
+            function createNode(element) {
+                return document.createElement(element);
+            }
+            function append(parent, el) {
+                return parent.appendChild(el);
+            }
+            const ul = document.getElementById('noticeblock');
+            const url = 'https://api.rootnet.in/covid19-in/notifications';
+            fetch(url)
+            .then((resp) => resp.json())
+            .then(function(d) {
+    
+                let notices = d.data.notifications;
+                console.log(notices);
+                var ind=0;
+                return notices.map(setInterval(function(notice) {
+                let li = createNode('li'),
+                    span = createNode('span');
+                ind=(ind+1)%124;
+                document.getElementById("noticeblock").innerHTML = "<a href='"+`${notices[ind].link}`+"' target='_blank'>"+`${notices[ind].title}`+"</a>";
+                // append(li, span);
+                // append(ul, li);
+                },3000))
+            })
+            .catch(function(error) {
+                console.log("hello1");
+            });   
+    
+        </script>
+
+        <script type="text/javascript">
+            google.charts.load("current", {packages:['corechart']});
+
+            const barurl = "https://corona-api.com/countries";
+
+            var getJSON = function(url, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'json';
+                xhr.onload = function() {
+                    var status = xhr.status;
+                    if (status === 200) {
+                        callback(null, xhr.response);
+                    } else {
+                        callback(status, xhr.response);
+                    }
+                };
+                xhr.send();
+            };
+            getJSON(barurl,function(err, data) {
+                if (err !== null) {
+                    alert('Something went wrong: ' + err);
+                } else {
+
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var arr = [];
+                var Header= ['Country', 'No Of Cases', { role: "style" }];
+                arr.push(Header);
+                var top=[];
+                for( var i=0;i<data.data.length;i++){
+                    var counter = data.data[i];
+                    var object = counter.latest_data;
+                    var obj={};
+                    obj.country=counter.name;
+                    obj.confirmed=object.confirmed;
+                    top.push(obj);
+                }
+                top.sort(function(a, b) {
+                var keyA = new Date(a.confirmed),
+                    keyB = new Date(b.confirmed);
+                // Compare the 2 dates
+                if (keyA < keyB) return -1;
+                if (keyA > keyB) return 1;
+                return 0;
+                });
+                for( var i=top.length-1;i>=top.length-15;i--){
+                    var temp=[];
+                    var obj = top[i];
+                    temp.push(top[i].country);
+                    temp.push(top[i].confirmed);
+                    temp.push("red");
+                    arr.push(temp);
+                }
+                console.log("OPP");
+                console.log(arr);
+                var value = google.visualization.arrayToDataTable(arr);
+            
+            var view = new google.visualization.DataView(value);
+            view.setColumns([0, 1,
+                            { calc: "stringify",
+                                sourceColumn: 1,
+                                type: "string",
+                                role: "annotation" },
+                            2]);
+
+            var options = {
+                title: "Cases across globe",
+                width: 1050,
+                height: 400,
+                bar: {groupWidth: "95%"},
+                legend: { position: "none" },
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+            chart.draw(view, options);
+            }
+        }
+    });
+        </script>
+        
+    </head>
+
+    <body ng-app="MyApp" ng-controller="MyCtrl" style="background-color: #132639;">
+        <div class="container" style="background-color: #00b33c;margin-top: 20px;margin-bottom: 20px;">
+            <div class="jumbotron py-3" style="margin-top: 10px;margin-bottom: 10px;background-color: #0088cc;">
+                <img src="2.png" style="width:240px;height:150px;margin-left:38%;">
+                <h1 class="text-center">{{title}}</h1>
+                
+                <p class="pt-3">
+                    Coronavirus disease 2019 (COVID-19) is an infectious disease caused by severe acute
+                    respiratory syndrome coronavirus 2 (SARS-CoV-2). It was first identified in December 2019 in Wuhan,
+                    China, and has since spread globally, resulting in an ongoing pandemic. As of 25 May 2020, more than
+                    5.43 million cases have been reported across 188 countries and territories, resulting in more than
+                        345,000 deaths. More than 2.18 million people have recovered.
+                </p>
+                <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
+                <h3>World Statistics:</h3>
+                <!-- all_data -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-warning text-white">
+                            <card-body>
+                                <h3 class="text-center">Confirmed Cases</h3>
+                                <h3 class="text-center">{{all_data.confirmed.value}}</h3>
+                            </card-body>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <card-body>
+                                <h3 class="text-center">Recovered Cases</h3>
+                                <h3 class="text-center">{{all_data.recovered.value}}</h3>
+                            </card-body>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white">
+                            <card-body>
+                                <h3 class="text-center">Death Cases</h3>
+                                <h3 class="text-center">{{all_data.deaths.value}}</h3>
+                            </card-body>
+                        </div>
+                    </div>
+                </div>
+                <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
+                <br>
+                <!-- END all_data HERE-->
+                <h3>India Statistics:</h3>
+                <!-- all_data -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-warning text-white">
+                            <card-body>
+                                <h3 class="text-center">Confirmed Cases</h3>
+                                <h3 class="text-center">{{india_data.confirmed.value}}</h3>
+                            </card-body>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <card-body>
+                                <h3 class="text-center">Recovered Cases</h3>
+                                <h3 class="text-center">{{india_data.recovered.value}}</h3>
+                            </card-body>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white">
+                            <card-body>
+                                <h3 class="text-center">Death Cases</h3>
+                                <h3 class="text-center">{{india_data.deaths.value}}</h3>
+                            </card-body>
+                        </div>
+                    </div>
+                </div>
+                <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
+                <!-- END all_data HERE-->
+                <br>
+                <h3>COVID-19 statistics for countries:</h3>
+                <input 
+                    type="text" 
+                    class="form-control mt-4"  
+                    placeholder="Enter Country"
+                    
+                    ng-model="c"
+                    ng-change="get_c_data()"
+                    />
+    
+                <!-- country data -->
+                <div class="container-fluid" ng-if="c_data">
+                    <h1 class="text-center mt-2 text-uppercase">{{c}} STATUS</h1>
+                    <div class="row text-center mt-4">
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-white">
+                                <card-body>
+                                    <h3 class="text-center">Confirmed Cases</h3>
+                                    <h3 class="text-center">{{c_data.confirmed.value}}</h3>
+                                </card-body>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <card-body>
+                                    <h3 class="text-center">Recovered Cases</h3>
+                                    <h3 class="text-center">{{c_data.recovered.value}}</h3>
+                                </card-body>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger text-white">
+                                <card-body>
+                                    <h3 class="text-center">Death Cases</h3>
+                                    <h3 class="text-center">{{c_data.deaths.value}}</h3>
+                                </card-body>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Country Data-->
+                <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
+                <br>
+                <h3>COVID-19 statistics for states of India:</h3>
+                <input 
+                    type="text" 
+                    class="form-control mt-4"  
+                    placeholder="Enter State of India"
+                    
+                    ng-model="s"
+                    ng-change="get_s_data()"
+                    />
+    
+                <!-- India Statewise data -->
+                <div class="container-fluid" ng-if="s_data">
+                    <h1 class="text-center mt-2 text-uppercase">{{s}} STATUS</h1>
+                    <div class="row text-center mt-4">
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-white">
+                                <card-body>
+                                    <h3 class="text-center">Confirmed Cases</h3>
+                                    <h3 class="text-center">{{s_data.confirmed}}</h3>
+                                </card-body>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <card-body>
+                                    <h3 class="text-center">Recovered Cases</h3>
+                                    <h3 class="text-center">{{s_data.recovered}}</h3>
+                                </card-body>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger text-white">
+                                <card-body>
+                                    <h3 class="text-center">Death Cases</h3>
+                                    <h3 class="text-center">{{s_data.deaths}}</h3>
+                                </card-body>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Country Data-->
+                <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
+                <br>
+                <div id="regions_div" style="width: 900px; height: 500px;"></div>
+                <br>
+                <br>
+
+                <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
+                <h3>Enter Date to find COVID-19 stats of India on that date:</h3>
+                <input type="date" id="date-input" required ng-model="d" ng-change="get_d_data()"/>
+                <div class="container-fluid" ng-if="d_data">
+                    <h3 class="text-center mt-2">India Statistics:</h3>
+                        <div class="row text-center mt-4">
+                            <div class="col-md-4">
+                                <div class="card bg-warning text-white">
+                                    <card-body>
+                                        <h3 class="text-center">Confirmed Cases</h3>
+                                        <h3 class="text-center">{{d_data.confirmed}}</h3>
+                                    </card-body>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-success text-white">
+                                    <card-body>
+                                        <h3 class="text-center">Recovered Cases</h3>
+                                        <h3 class="text-center">{{d_data.recovered}}</h3>
+                                    </card-body>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-danger text-white">
+                                    <card-body>
+                                        <h3 class="text-center">Death Cases</h3>
+                                        <h3 class="text-center">{{d_data.deaths}}</h3>
+                                    </card-body>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <br>
+                <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
+
+                <div id="columnchart_values" style="width: 900px; height: 300px;"></div>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+
+
+                <h3>Government Helpline Contact Info:</h3>
+                <input 
+                    type="text" 
+                    class="form-control mt-4"  
+                    placeholder="Enter State of India"
+                    
+                    ng-model="ct"
+                    ng-change="get_ct_data()"
+                    />
+
+                <div ng-if="ct_data">
+                    <div style="background-color: #ffff00; border: 1px solid black;">
+                        <h4 class="text-center">Helpline Number: {{ct_data}}</h4>
+                    </div>
+                </div>
+
+                <br>
+                <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
+                <h3>Latest Updates:</h3>
+                <div class="notification">
+                    <ul id="noticeblock" style="margin-top: 10px;margin-bottom: 10px;background-color: #ff9980;border: 1px solid black;"></ul>
+                </div>
+
+            </div>
+        </div>
+    </body>
+</html>
