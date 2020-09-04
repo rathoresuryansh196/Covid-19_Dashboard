@@ -90,13 +90,7 @@
             });
         </script>
         
-        <script>  
-            function createNode(element) {
-                return document.createElement(element);
-            }
-            function append(parent, el) {
-                return parent.appendChild(el);
-            }
+        <script>              
             const ul = document.getElementById('noticeblock');
             const url = 'https://api.rootnet.in/covid19-in/notifications';
             fetch(url)
@@ -107,12 +101,9 @@
                 console.log(notices);
                 var ind=0;
                 return notices.map(setInterval(function(notice) {
-                let li = createNode('li'),
-                    span = createNode('span');
+               
                 ind=(ind+1)%124;
-                document.getElementById("noticeblock").innerHTML = "<a href='"+`${notices[ind].link}`+"' target='_blank'>"+`${notices[ind].title}`+"</a>";
-                // append(li, span);
-                // append(ul, li);
+                document.getElementById("noticeblock").innerHTML = "<a href='"+`${notices[ind].link}`+"' target='_blank'>"+`${notices[ind].title}`+"</a>";        
                 },3000))
             })
             .catch(function(error) {
