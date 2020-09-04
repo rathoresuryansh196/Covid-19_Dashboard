@@ -136,60 +136,60 @@
                     alert('Something went wrong: ' + err);
                 } else {
 
-            google.charts.setOnLoadCallback(drawChart);
-            function drawChart() {
-                var arr = [];
-                var Header= ['Country', 'No Of Cases', { role: "style" }];
-                arr.push(Header);
-                var top=[];
-                for( var i=0;i<data.data.length;i++){
-                    var counter = data.data[i];
-                    var object = counter.latest_data;
-                    var obj={};
-                    obj.country=counter.name;
-                    obj.confirmed=object.confirmed;
-                    top.push(obj);
-                }
-                top.sort(function(a, b) {
-                var keyA = new Date(a.confirmed),
-                    keyB = new Date(b.confirmed);
-                // Compare the 2 dates
-                if (keyA < keyB) return -1;
-                if (keyA > keyB) return 1;
-                return 0;
-                });
-                for( var i=top.length-1;i>=top.length-15;i--){
-                    var temp=[];
-                    var obj = top[i];
-                    temp.push(top[i].country);
-                    temp.push(top[i].confirmed);
-                    temp.push("red");
-                    arr.push(temp);
-                }
-                console.log("OPP");
-                console.log(arr);
-                var value = google.visualization.arrayToDataTable(arr);
-            
-            var view = new google.visualization.DataView(value);
-            view.setColumns([0, 1,
-                            { calc: "stringify",
-                                sourceColumn: 1,
-                                type: "string",
-                                role: "annotation" },
-                            2]);
+                    google.charts.setOnLoadCallback(drawChart);
+                    function drawChart() {
+                        var arr = [];
+                        var Header= ['Country', 'No Of Cases', { role: "style" }];
+                        arr.push(Header);
+                        var top=[];
+                        for( var i=0;i<data.data.length;i++){
+                            var counter = data.data[i];
+                            var object = counter.latest_data;
+                            var obj={};
+                            obj.country=counter.name;
+                            obj.confirmed=object.confirmed;
+                            top.push(obj);
+                        }
+                        top.sort(function(a, b) {
+                        var keyA = new Date(a.confirmed),
+                            keyB = new Date(b.confirmed);
+                        // Compare the 2 dates
+                        if (keyA < keyB) return -1;
+                        if (keyA > keyB) return 1;
+                        return 0;
+                        });
+                        for( var i=top.length-1;i>=top.length-15;i--){
+                            var temp=[];
+                            var obj = top[i];
+                            temp.push(top[i].country);
+                            temp.push(top[i].confirmed);
+                            temp.push("red");
+                            arr.push(temp);
+                        }
+                        console.log("OPP");
+                        console.log(arr);
+                        var value = google.visualization.arrayToDataTable(arr);
 
-            var options = {
-                title: "Cases across globe",
-                width: 1050,
-                height: 400,
-                bar: {groupWidth: "95%"},
-                legend: { position: "none" },
-            };
-            var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
-            chart.draw(view, options);
+                        var view = new google.visualization.DataView(value);
+                        view.setColumns([0, 1,
+                                        { calc: "stringify",
+                                            sourceColumn: 1,
+                                            type: "string",
+                                            role: "annotation" },
+                                        2]);
+
+                        var options = {
+                            title: "Cases across globe",
+                            width: 1050,
+                            height: 400,
+                            bar: {groupWidth: "95%"},
+                            legend: { position: "none" },
+                        };
+                        var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+                        chart.draw(view, options);
+                }
             }
-        }
-    });
+        });
         </script>
         
     </head>
