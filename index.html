@@ -14,13 +14,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>COVID-19 Dashboard</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-        <link rel = "stylesheet" href="css/style.css"> 
+        <link rel = "stylesheet" href="css/style.css">
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
         <script src= "https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
-        
+
         <script type="text/javascript" src="js/myscript.js"></script>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
@@ -36,8 +36,8 @@
 
             var getJSON = function(url, callback) {
                 var xhr = new XMLHttpRequest();
-                xhr.open('GET', url, true);
-                xhr.responseType = 'json';
+                xhr.open('POST', url, true);
+                xhr.contentType = 'application/javascript; charset=utf-8';
                 xhr.onload = function() {
                     var status = xhr.status;
                     if (status === 200) {
@@ -54,12 +54,13 @@
                 } else {
                 
                     google.charts.setOnLoadCallback(drawRegionsMap(data));
-
+                    
                     function drawRegionsMap(data) {
+                        //console.log(data.length);
                         var arr=[];
                         var Header= ['State', 'No Of Cases'];
                         arr.push(Header);
-                        console.log("GET Ready");
+                        //console.log("GET Ready");
                         for( i=0;i<36;i++){
                             var temp=[];
                             temp.push(data[i].provinceState);
@@ -89,27 +90,36 @@
                 }
             });
         </script>
-        
-        <script>              
+
+        <script>
+            function createNode(element) {
+                return document.createElement(element);
+            }
+            function append(parent, el) {
+                return parent.appendChild(el);
+            }
             const ul = document.getElementById('noticeblock');
             const url = 'https://api.rootnet.in/covid19-in/notifications';
             fetch(url)
             .then((resp) => resp.json())
             .then(function(d) {
-    
+
                 let notices = d.data.notifications;
-                console.log(notices);
+                //console.log(notices);
                 var ind=0;
                 return notices.map(setInterval(function(notice) {
-               
+                let li = createNode('li'),
+                    span = createNode('span');
                 ind=(ind+1)%124;
-                document.getElementById("noticeblock").innerHTML = "<a href='"+`${notices[ind].link}`+"' target='_blank'>"+`${notices[ind].title}`+"</a>";        
+                document.getElementById("noticeblock").innerHTML = "<a href='"+`${notices[ind].link}`+"' target='_blank'>"+`${notices[ind].title}`+"</a>";
+                // append(li, span);
+                // append(ul, li);
                 },3000))
             })
             .catch(function(error) {
-                console.log("Error in Noticification");
-            });   
-    
+                console.log("Noticeblock error");
+            });
+
         </script>
 
         <script type="text/javascript">
@@ -136,70 +146,116 @@
                     alert('Something went wrong: ' + err);
                 } else {
 
-                    google.charts.setOnLoadCallback(drawChart);
-                    function drawChart() {
-                        var arr = [];
-                        var Header= ['Country', 'No Of Cases', { role: "style" }];
-                        arr.push(Header);
-                        var top=[];
-                        for( var i=0;i<data.data.length;i++){
-                            var counter = data.data[i];
-                            var object = counter.latest_data;
-                            var obj={};
-                            obj.country=counter.name;
-                            obj.confirmed=object.confirmed;
-                            top.push(obj);
-                        }
-                        top.sort(function(a, b) {
-                        var keyA = new Date(a.confirmed),
-                            keyB = new Date(b.confirmed);
-                        // Compare the 2 dates
-                        if (keyA < keyB) return -1;
-                        if (keyA > keyB) return 1;
-                        return 0;
-                        });
-                        for( var i=top.length-1;i>=top.length-15;i--){
-                            var temp=[];
-                            var obj = top[i];
-                            temp.push(top[i].country);
-                            temp.push(top[i].confirmed);
-                            temp.push("red");
-                            arr.push(temp);
-                        }
-                        console.log("OPP");
-                        console.log(arr);
-                        var value = google.visualization.arrayToDataTable(arr);
-
-                        var view = new google.visualization.DataView(value);
-                        view.setColumns([0, 1,
-                                        { calc: "stringify",
-                                            sourceColumn: 1,
-                                            type: "string",
-                                            role: "annotation" },
-                                        2]);
-
-                        var options = {
-                            title: "Cases across globe",
-                            width: 1050,
-                            height: 400,
-                            bar: {groupWidth: "95%"},
-                            legend: { position: "none" },
-                        };
-                        var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
-                        chart.draw(view, options);
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var arr = [];
+                var Header= ['Country', 'No Of Cases', { role: "style" }];
+                arr.push(Header);
+                var top=[];
+                for( var i=0;i<data.data.length;i++){
+                    var counter = data.data[i];
+                    var object = counter.latest_data;
+                    var obj={};
+                    obj.country=counter.name;
+                    obj.confirmed=object.confirmed;
+                    top.push(obj);
                 }
+                top.sort(function(a, b) {
+                var keyA = new Date(a.confirmed),
+                    keyB = new Date(b.confirmed);
+                // Compare the 2 dates
+                if (keyA < keyB) return -1;
+                if (keyA > keyB) return 1;
+                return 0;
+                });
+                for( var i=top.length-1;i>=top.length-15;i--){
+                    var temp=[];
+                    var obj = top[i];
+                    temp.push(top[i].country);
+                    temp.push(top[i].confirmed);
+                    temp.push("red");
+                    arr.push(temp);
+                }
+                //console.log("OPP");
+                //console.log(arr);
+                var value = google.visualization.arrayToDataTable(arr);
+
+            var view = new google.visualization.DataView(value);
+            view.setColumns([0, 1,
+                            { calc: "stringify",
+                                sourceColumn: 1,
+                                type: "string",
+                                role: "annotation" },
+                            2]);
+
+            var options = {
+                title: "Cases across globe",
+                width: 1050,
+                height: 400,
+                bar: {groupWidth: "95%"},
+                legend: { position: "none" },
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+            chart.draw(view, options);
             }
-        });
+        }
+    });
         </script>
-        
+
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+          body {
+          margin: 0;
+          font-family: Arial, Helvetica, sans-serif;
+          }
+
+          .topnav {
+          overflow: hidden;
+          background-color: #105071;
+          }
+
+          .topnav a {
+          float: left;
+          color: #f2f2f2;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+          font-size: 17px;
+          }
+
+          .topnav a:hover {
+          background-color: #ddd;
+          color: black;
+          }
+
+          .topnav a.active {
+          background-color: #4CAF50;
+          color: white;
+          }
+
+          .topnav-right {
+          float: right;
+          }
+          </style>
+
+
     </head>
 
     <body ng-app="MyApp" ng-controller="MyCtrl" style="background-color: #132639;">
+
+      <div class="topnav">
+        <a class="active" href="index.html">Home</a>
+        <div class="topnav-right">
+          <a href="patientform.html">Medical Form</a>
+        </div>
+      </div>
+
         <div class="container" style="background-color: #00b33c;margin-top: 20px;margin-bottom: 20px;">
             <div class="jumbotron py-3" style="margin-top: 10px;margin-bottom: 10px;background-color: #0088cc;">
                 <img src="2.png" style="width:240px;height:150px;margin-left:38%;">
                 <h1 class="text-center">{{title}}</h1>
-                
+
                 <p class="pt-3">
                     Coronavirus disease 2019 (COVID-19) is an infectious disease caused by severe acute
                     respiratory syndrome coronavirus 2 (SARS-CoV-2). It was first identified in December 2019 in Wuhan,
@@ -271,15 +327,15 @@
                 <!-- END all_data HERE-->
                 <br>
                 <h3>COVID-19 statistics for countries:</h3>
-                <input 
-                    type="text" 
-                    class="form-control mt-4"  
+                <input
+                    type="text"
+                    class="form-control mt-4"
                     placeholder="Enter Country"
-                    
+
                     ng-model="c"
                     ng-change="get_c_data()"
                     />
-    
+
                 <!-- country data -->
                 <div class="container-fluid" ng-if="c_data">
                     <h1 class="text-center mt-2 text-uppercase">{{c}} STATUS</h1>
@@ -314,15 +370,15 @@
                 <hr style="height: 0.2px;border: 0.2px solid black;background-color: black;">
                 <br>
                 <h3>COVID-19 statistics for states of India:</h3>
-                <input 
-                    type="text" 
-                    class="form-control mt-4"  
+                <input
+                    type="text"
+                    class="form-control mt-4"
                     placeholder="Enter State of India"
-                    
+
                     ng-model="s"
                     ng-change="get_s_data()"
                     />
-    
+
                 <!-- India Statewise data -->
                 <div class="container-fluid" ng-if="s_data">
                     <h1 class="text-center mt-2 text-uppercase">{{s}} STATUS</h1>
@@ -405,11 +461,11 @@
 
 
                 <h3>Government Helpline Contact Info:</h3>
-                <input 
-                    type="text" 
-                    class="form-control mt-4"  
+                <input
+                    type="text"
+                    class="form-control mt-4"
                     placeholder="Enter State of India"
-                    
+
                     ng-model="ct"
                     ng-change="get_ct_data()"
                     />

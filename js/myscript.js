@@ -7,14 +7,14 @@ app.controller('MyCtrl', ($scope, $http)=>{
 
     $scope.title = "COVID-19 Dashboard";
 
-    console.log("APP Loaded");
+    //console.log("APP Loaded");
  
     // Calling API
 
-    $http.get(URL).then(
+    $http.get(`${URL}`).then(
         (response)=>{
             
-             console.log(response.data);
+             //console.log(response.data);
              $scope.all_data = response.data
         },
         (error)=> {
@@ -26,7 +26,7 @@ app.controller('MyCtrl', ($scope, $http)=>{
     $http.get(`${URL}/countries/${"india"}`).then(
         (response)=>{
             
-             console.log(response.data);
+             //console.log(response.data);
              $scope.india_data = response.data
         },
         (error)=> {
@@ -44,7 +44,7 @@ app.controller('MyCtrl', ($scope, $http)=>{
 
         $http.get(`${URL}/countries/${country}`)
         .then((response)=>{
-            console.log(response.data);
+            //console.log(response.data);
             $scope.c_data = response.data;
         },
         (error)=>{
@@ -64,7 +64,7 @@ app.controller('MyCtrl', ($scope, $http)=>{
                     obj = response.data[i];
                     if(obj.provinceState.toLowerCase() == state.toLowerCase()){
                         $scope.s_data = obj;
-                        console.log(obj.provinceState);
+                        //console.log(obj.provinceState);
                         break;
                     }
                   }
@@ -82,13 +82,13 @@ app.controller('MyCtrl', ($scope, $http)=>{
             $scope.ct_data="";
         $http.get(`${URL1}`).then(
             (response)=>{
-                console.log(response.data.data.contacts.regional);
+                //console.log(response.data.data.contacts.regional);
                 for (i = 0; i < response.data.data.contacts.regional.length; i++) {
                     obj1 = response.data.data.contacts.regional[i].loc;
                     //console.log(obj1);
                     if(obj1.toLowerCase() == st.toLowerCase()){
                         $scope.ct_data = response.data.data.contacts.regional[i].number;
-                        console.log($scope.ct_data);
+                        //console.log($scope.ct_data);
                         break;
                     }
                   }
